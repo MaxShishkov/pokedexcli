@@ -1,4 +1,4 @@
-package repl
+package main
 
 import (
 	"testing"
@@ -32,7 +32,7 @@ func TestCleanInput(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		actual := CleanInput(c.input)
+		actual := cleanInput(c.input)
 		if len(actual) != len(c.expected) {
 			t.Errorf("cleanInput(%q) = %v; expected %v", c.input, actual, c.expected)
 		}
