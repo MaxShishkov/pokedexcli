@@ -13,6 +13,11 @@ type cliCommand struct {
 	Callback    func() error
 }
 
+type requestConfig struct {
+	Next      string
+	Previouse string
+}
+
 func startRepl() {
 	cmdMap := make(map[string]cliCommand)
 
@@ -26,6 +31,12 @@ func startRepl() {
 		Name:        "help",
 		Description: "Show this help message",
 		Callback:    func() error { return commandHelp(cmdMap) },
+	}
+
+	cmdMap["map"] = cliCommand{
+		Name:        "map",
+		Description: "Show the location areas of the Pokemon world",
+		Callback:    commandMap,
 	}
 
 	scanner := bufio.NewScanner(os.Stdin)
