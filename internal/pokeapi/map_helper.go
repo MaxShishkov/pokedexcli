@@ -1,4 +1,4 @@
-package map_helper
+package pokeapi
 
 type ResourceReference struct {
 	Name string `json:"name"`
@@ -11,7 +11,7 @@ type EncounterMethodVersionDetail struct {
 }
 
 type EncounterMethodRate struct {
-	EncounterMethod ResourceReference               `json:"encounter_method"`
+	EncounterMethod ResourceReference              `json:"encounter_method"`
 	VersionDetails  []EncounterMethodVersionDetail `json:"version_details"`
 }
 
@@ -50,8 +50,18 @@ type LocationArea struct {
 }
 
 type LocationAreaResponse struct {
-	Count    int    `json:"count"`
-	Next     string `json:"next"`
-	Previous *string    `json:"previous"`
+	Count    int            `json:"count"`
+	Next     *string        `json:"next"`
+	Previous *string        `json:"previous"`
 	Results  []LocationArea `json:"results"`
+}
+
+type ShallowLocationAreaResponse struct {
+	Count    int     `json:"count"`
+	Next     *string `json:"next"`
+	Previous *string `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
 }

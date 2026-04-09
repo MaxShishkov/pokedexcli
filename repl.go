@@ -5,40 +5,23 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"github.com/MaxShishkov/pokedexcli/internal/pokeapi"
 )
 
-type cliCommand struct {
-	Name        string
-	Description string
-	Callback    func() error
-}
-
 type requestConfig struct {
-	Next      string
-	Previouse string
+	pokeapiClient pokeapi.Client
+	next          *string
+	previouse     *string
 }
 
-func startRepl() {
-	cmdMap := make(map[string]cliCommand)
+type cliCommand struct {
+	name        string
+	description string
+	callback    func(*requestConfig) error
+}
 
-	cmdMap["exit"] = cliCommand{
-		Name:        "exit",
-		Description: "Exit the Pokedex",
-		Callback:    commandExit,
-	}
-
-	cmdMap["help"] = cliCommand{
-		Name:        "help",
-		Description: "Show this help message",
-		Callback:    func() error { return commandHelp(cmdMap) },
-	}
-
-	cmdMap["map"] = cliCommand{
-		Name:        "map",
-		Description: "Show the location areas of the Pokemon world",
-		Callback:    commandMap,
-	}
-
+func startRepl(cfg *requestConfig) {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	for {
@@ -51,16 +34,45 @@ func startRepl() {
 		}
 		cmdName := words[0]
 
-		cmd, ok := cmdMap[cmdName]
+		cmd, ok := getCommands()[cmdName]
 		if !ok {
 			fmt.Println("Unknown command")
 			continue
 		}
-		cmd.Callback()
+
+		err := cmd.callback(cfg)
+		if err != nil {
+			fmt.Println("Error occurred:", err)
+		}
 	}
 }
 
 func cleanInput(text string) []string {
 	output := strings.ToLower(text)
 	return strings.Fields(output)
+}
+
+func getCommands() map[string]cliCommand {
+	return map[string]cliCommand{
+		"help": {
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Get the next page of locations",
+			callback:    commandMapf,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Get the previous page of locations",
+			callback:    commandMapb,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
+		},
+	}
 }

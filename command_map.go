@@ -1,35 +1,36 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
-	"log"
-	"net/http"
-
-	"github.com/MaxShishkov/pokedexcli/internal/map_helper"
 )
 
-func commandMap() error {
-	res, err := http.Get("https://pokeapi.co/api/v2/location-area/")
+func commandMapf(cfg *requestConfig) error {
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.next)
 	if err != nil {
-		log.Fatal(err)
-	}
-	defer res.Body.Close()
-
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	var locationAreasResponse map_helper.LocationAreaResponse
-	err = json.Unmarshal(body, &locationAreasResponse)
-	if err != nil {
-		log.Fatal(err)
+	cfg.next = locationResp.Next
+	cfg.previouse = locationResp.Previous
+
+	for _, loc := range locationResp.Results {
+		fmt.Println(loc.Name)
 	}
 
-	for _, locationArea := range locationAreasResponse.Results {
-		fmt.Println(locationArea.Name)
+	return nil
+}
+
+func commandMapb(cfg *requestConfig) error {
+	locationResp, err := cfg.pokeapiClient.ListLocations(cfg.previouse)
+	if err != nil {
+		return err
+	}
+
+	cfg.next = locationResp.Next
+	cfg.previouse = locationResp.Previous
+
+	for _, loc := range locationResp.Results {
+		fmt.Println(loc.Name)
 	}
 
 	return nil
