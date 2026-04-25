@@ -12,19 +12,26 @@ func (c *Client) ListLocations(pageURL *string) (ShallowLocationAreaResponse, er
 		url = *pageURL
 	}
 
-	res, err := http.Get(url)
-	if err != nil {
-		return ShallowLocationAreaResponse{}, err
-	}
-	defer res.Body.Close()
+	var body []byte
 
-	body, err := io.ReadAll(res.Body)
-	if err != nil {
-		return ShallowLocationAreaResponse{}, err
+	if entry, exists := c.cache.Get(url); exists {
+		body = entry
+	} else {
+		res, err := http.Get(url)
+		if err != nil {
+			return ShallowLocationAreaResponse{}, err
+		}
+		defer res.Body.Close()
+
+		body, err = io.ReadAll(res.Body)
+		if err != nil {
+			return ShallowLocationAreaResponse{}, err
+		}
+		c.cache.Add(url, body)
 	}
 
 	locationResp := ShallowLocationAreaResponse{}
-	err = json.Unmarshal(body, &locationResp)
+	err := json.Unmarshal(body, &locationResp)
 	if err != nil {
 		return ShallowLocationAreaResponse{}, err
 	}

@@ -17,10 +17,12 @@ type Cache struct {
 }
 
 func NewCache(t time.Duration) *Cache {
-	return &Cache{
+	c := &Cache{
 		entries:  make(map[string]cacheEntry),
 		interval: t,
 	}
+	go c.reapLoop()
+	return c
 }
 
 func (c *Cache) Add(key string, value []byte) {
