@@ -65,3 +65,7 @@ type ShallowLocationAreaResponse struct {
 		URL  string `json:"url"`
 	} `json:"results"`
 }
+
+type ShallowPokemonEncounters struct {
+	PokemonEncounters    []PokemonEncounter    `json:"pokemon_encounters"`
+}
