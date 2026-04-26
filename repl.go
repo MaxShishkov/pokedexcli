@@ -1,12 +1,11 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/MaxShishkov/pokedexcli/internal/pokeapi"
+	"github.com/peterh/liner"
 )
 
 type requestConfig struct {
@@ -18,21 +17,27 @@ type requestConfig struct {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*requestConfig) error
+	callback    func(*requestConfig, ...string) error
 }
 
 func startRepl(cfg *requestConfig) {
-	scanner := bufio.NewScanner(os.Stdin)
+	line := liner.NewLiner()
+	defer line.Close()
+	line.SetCtrlCAborts(true)
 
 	for {
-		fmt.Print("Pokedex > ")
-		scanner.Scan()
-		text := scanner.Text()
-		words := cleanInput(text)
+		input, err := line.Prompt("Pokedex > ")
+		if err != nil {
+			break
+		}
+		line.AppendHistory(input)
+
+		words := cleanInput(input)
 		if len(words) == 0 {
 			continue
 		}
 		cmdName := words[0]
+		params := words[1:]
 
 		cmd, ok := getCommands()[cmdName]
 		if !ok {
@@ -40,7 +45,7 @@ func startRepl(cfg *requestConfig) {
 			continue
 		}
 
-		err := cmd.callback(cfg)
+		err = cmd.callback(cfg, params...)
 		if err != nil {
 			fmt.Println("Error occurred:", err)
 		}
@@ -68,6 +73,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Get the previous page of locations",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:			"explore",
+			description:	"Get the list of pokemon in the area",
+			callback:		commandExplore,
 		},
 		"exit": {
 			name:        "exit",
