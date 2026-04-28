@@ -9,9 +9,10 @@ import (
 )
 
 type requestConfig struct {
-	pokeapiClient pokeapi.Client
-	next          *string
-	previouse     *string
+	pokeapiClient  pokeapi.Client
+	next           *string
+	previouse      *string
+	caughtPokemons map[string]pokeapi.Pokemon
 }
 
 type cliCommand struct {
@@ -75,9 +76,14 @@ func getCommands() map[string]cliCommand {
 			callback:    commandMapb,
 		},
 		"explore": {
-			name:			"explore",
-			description:	"Get the list of pokemon in the area",
-			callback:		commandExplore,
+			name:        "explore",
+			description: "Get the list of pokemon in the area",
+			callback:    commandExplore,
+		},
+		"catch": {
+			name:        "catch",
+			description: "Catch a pokemon",
+			callback:    commandCatch,
 		},
 		"exit": {
 			name:        "exit",
