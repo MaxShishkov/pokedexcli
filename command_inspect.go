@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 )
 
@@ -11,8 +12,7 @@ func commandInspect(cfg *requestConfig, params ...string) error {
 
 	pokemon, caught := cfg.caughtPokemons[params[0]]
 	if !caught {
-		fmt.Println("you have not caught that pokemon")
-		return nil
+		return errors.New("you have not caught that pokemon")
 	}
 
 	fmt.Printf("Name: %s\n", pokemon.Name)
@@ -20,7 +20,7 @@ func commandInspect(cfg *requestConfig, params ...string) error {
 	fmt.Printf("Weight: %d\n", pokemon.Weight)
 	fmt.Println("Stats:")
 	for _, stat := range pokemon.Stats {
-		fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+		fmt.Printf("  -%s: %v\n", stat.Stat.Name, stat.BaseStat)
 	}
 
 	fmt.Println("Types:")
