@@ -2,14 +2,12 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
 
 func (c *Client) GetPokemon(name string) (Pokemon, error) {
 	url := baseURL + "pokemon/" + name
-	fmt.Println(url)
 
 	var body []byte
 
